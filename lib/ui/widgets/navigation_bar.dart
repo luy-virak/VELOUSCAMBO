@@ -15,7 +15,7 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
 
   final List<Widget> _screens = const [
     MapScreen(),
-    SearchScreen(),
+
     HistoryScreen(),
     ProfileScreen(),
   ];
@@ -60,24 +60,18 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
                   onTap: () => onTap(0),
                 ),
                 NavItem(
-                  icon: Icons.search_rounded,
-                  label: "Search",
+                  icon: Icons.history_rounded,
+                  label: "History",
                   isSelected: selectedIndex == 1,
                   onTap: () => onTap(1),
                 ),
                 NavItem(
-                  icon: Icons.history_rounded,
-                  label: "History",
-                  isSelected: selectedIndex == 2,
-                  onTap: () => onTap(2),
-                ),
-                NavItem(
-                  icon: selectedIndex == 3
+                  icon: selectedIndex == 2
                       ? Icons.person_rounded
                       : Icons.person_outline_rounded,
                   label: "Profile",
-                  isSelected: selectedIndex == 3,
-                  onTap: () => onTap(3),
+                  isSelected: selectedIndex == 2,
+                  onTap: () => onTap(2),
                 ),
               ],
             ),
