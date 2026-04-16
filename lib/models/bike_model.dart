@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class BikeModel {
   final String id;
   final String stationId;
@@ -16,22 +14,4 @@ class BikeModel {
   });
 
   bool get isAvailable => status == 'available';
-
-  factory BikeModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return BikeModel(
-      id: doc.id,
-      stationId: data['stationId'] ?? '',
-      code: data['code'] ?? '',
-      status: data['status'] ?? 'available',
-      condition: (data['condition'] as num?)?.toDouble() ?? 5.0,
-    );
-  }
-
-  Map<String, dynamic> toMap() => {
-        'stationId': stationId,
-        'code': code,
-        'status': status,
-        'condition': condition,
-      };
 }

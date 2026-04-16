@@ -3,6 +3,10 @@ import '../models/station_model.dart';
 import '../models/bike_model.dart';
 import '../models/user_model.dart';
 import '../models/rental_model.dart';
+import '../dto/station_dto.dart';
+import '../dto/bike_dto.dart';
+import '../dto/user_dto.dart';
+import '../dto/rental_dto.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -11,7 +15,7 @@ class FirestoreService {
 
   Stream<List<StationModel>> getStations() {
     return _db.collection('stations').snapshots().map(
-          (snap) => snap.docs.map(StationModel.fromFirestore).toList(),
+          (snap) => snap.docs.map(StationDto.fromFirestore).toList(),
         );
   }
 
@@ -20,7 +24,7 @@ class FirestoreService {
         .collection('bikes')
         .where('stationId', isEqualTo: stationId)
         .snapshots()
-        .map((snap) => snap.docs.map(BikeModel.fromFirestore).toList());
+        .map((snap) => snap.docs.map(BikeDto.fromFirestore).toList());
   }
 
   // ─── User ─────────────────────────────────────────────────────────────────
@@ -42,7 +46,7 @@ class FirestoreService {
         .collection('users')
         .doc(uid)
         .snapshots()
-        .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
+        .map((doc) => doc.exists ? UserDto.fromFirestore(doc) : null);
   }
 
   Future<bool> userProfileExists(String uid) async {
@@ -86,7 +90,7 @@ class FirestoreService {
     await batch.commit();
 
     final snap = await rentalRef.get();
-    return RentalModel.fromFirestore(snap);
+    return RentalDto.fromFirestore(snap);
   }
 
   Future<void> endRental({
@@ -121,7 +125,7 @@ class FirestoreService {
         .limit(1)
         .snapshots()
         .map((snap) =>
-            snap.docs.isEmpty ? null : RentalModel.fromFirestore(snap.docs.first));
+            snap.docs.isEmpty ? null : RentalDto.fromFirestore(snap.docs.first));
   }
 
   Stream<List<RentalModel>> getRentalHistory(String userId) {
@@ -131,7 +135,7 @@ class FirestoreService {
         .where('status', isEqualTo: 'completed')
         .orderBy('startTime', descending: true)
         .snapshots()
-        .map((snap) => snap.docs.map(RentalModel.fromFirestore).toList());
+        .map((snap) => snap.docs.map(RentalDto.fromFirestore).toList());
   }
 
   // ─── Seed Demo Data ───────────────────────────────────────────────────────

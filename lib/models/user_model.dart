@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class UserModel {
   final String id;
   final String name;
@@ -34,29 +32,6 @@ class UserModel {
         return 'No Plan';
     }
   }
-
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return UserModel(
-      id: doc.id,
-      name: data['name'] ?? '',
-      email: data['email'] ?? '',
-      photoUrl: data['photoUrl'],
-      plan: data['plan'] ?? 'none',
-      planExpiry: data['planExpiry'] != null
-          ? (data['planExpiry'] as Timestamp).toDate()
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toMap() => {
-        'name': name,
-        'email': email,
-        'photoUrl': photoUrl,
-        'plan': plan,
-        'planExpiry':
-            planExpiry != null ? Timestamp.fromDate(planExpiry!) : null,
-      };
 
   UserModel copyWith({
     String? name,

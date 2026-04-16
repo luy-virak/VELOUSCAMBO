@@ -1,101 +1,122 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import '../data/repositories/auth_repository.dart';
 import '../models/user_model.dart';
-import '../services/auth_service.dart';
-import '../services/firestore_service.dart';
+import '../states/auth_state.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
-  final FirestoreService _firestoreService = FirestoreService();
+  final AuthRepository _repository;
 
+  AuthState _state = const AuthInitial();
   User? _firebaseUser;
-  UserModel? _userModel;
-  bool _isLoading = false;
-  String? _error;
-  StreamSubscription<UserModel?>? _userSubscription;
 
-  User? get firebaseUser => _firebaseUser;
-  UserModel? get userModel => _userModel;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
-  bool get isAuthenticated => _firebaseUser != null;
+  StreamSubscription<User?>? _authSub;
+  StreamSubscription<UserModel?>? _userSub;
 
-  AuthProvider() {
-    _authService.authStateChanges.listen(_onAuthStateChanged);
+  AuthProvider({AuthRepository? repository})
+      : _repository = repository ?? AuthRepository() {
+    _authSub = _repository.authStateChanges.listen(_onAuthStateChanged);
   }
+
+  // ── State ─────────────────────────────────────────────────────────────────
+
+  AuthState get state => _state;
+
+  // ── Convenience getters (screens use these) ───────────────────────────────
+
+  bool get isAuthenticated => _state is AuthAuthenticated;
+  bool get isLoading => _state is AuthLoading;
+  String? get error => _state is AuthError ? (_state as AuthError).message : null;
+  UserModel? get userModel =>
+      _state is AuthAuthenticated ? (_state as AuthAuthenticated).user : null;
+
+  /// Kept so screens can read `.firebaseUser?.uid` without changes.
+  User? get firebaseUser => _firebaseUser;
+
+  // ── Internal ──────────────────────────────────────────────────────────────
 
   void _onAuthStateChanged(User? user) {
     _firebaseUser = user;
-    _userSubscription?.cancel();
-    if (user != null) {
-      _userSubscription = _firestoreService
-          .getUser(user.uid)
-          .listen((model) {
-        _userModel = model;
-        notifyListeners();
-      });
-    } else {
-      _userModel = null;
+    _userSub?.cancel();
+
+    if (user == null) {
+      _state = const AuthUnauthenticated();
+      notifyListeners();
+      return;
     }
-    notifyListeners();
+
+    // Keep loading while Firestore profile hasn't arrived yet.
+    if (_state is! AuthAuthenticated) {
+      _state = const AuthLoading();
+      notifyListeners();
+    }
+
+    _userSub = _repository.watchUser(user.uid).listen((model) {
+      _state = model != null
+          ? AuthAuthenticated(model)
+          : const AuthUnauthenticated();
+      notifyListeners();
+    });
   }
 
+  // ── Actions ───────────────────────────────────────────────────────────────
+
   Future<bool> signIn(String email, String password) async {
-    _setLoading(true);
+    _state = const AuthLoading();
+    notifyListeners();
     try {
-      await _authService.signIn(email, password);
-      _clearError();
+      await _repository.signIn(email, password);
+      // State transitions to AuthAuthenticated via _onAuthStateChanged.
       return true;
     } on FirebaseAuthException catch (e) {
-      _setError(_friendlyError(e.code));
+      _state = AuthError(_friendlyError(e.code));
+      notifyListeners();
       return false;
     } catch (e) {
-      _setError('Unexpected error: $e');
+      _state = AuthError('Unexpected error: $e');
+      notifyListeners();
       return false;
-    } finally {
-      _setLoading(false);
     }
   }
 
   Future<bool> register(String name, String email, String password) async {
-    _setLoading(true);
+    _state = const AuthLoading();
+    notifyListeners();
     try {
-      final cred = await _authService.register(email, password);
+      final cred = await _repository.register(email, password);
 
-      // Firestore writes — timeout after 10s so the app never freezes
-      await _firestoreService
-          .createUser(cred.user!.uid, name, email)
+      await _repository
+          .createUserProfile(cred.user!.uid, name, email)
           .timeout(const Duration(seconds: 10), onTimeout: () {
         throw Exception(
             'Could not reach database. Check Firestore is enabled in Firebase Console.');
       });
 
-      await _firestoreService.seedDemoData().timeout(
+      await _repository.seedDemoData().timeout(
             const Duration(seconds: 10),
             onTimeout: () {},
           );
 
-      _clearError();
       return true;
     } on FirebaseAuthException catch (e) {
-      _setError(_friendlyError(e.code));
+      _state = AuthError(_friendlyError(e.code));
+      notifyListeners();
       return false;
     } catch (e) {
-      _setError(e.toString().replaceFirst('Exception: ', ''));
+      _state = AuthError(e.toString().replaceFirst('Exception: ', ''));
+      notifyListeners();
       return false;
-    } finally {
-      _setLoading(false);
     }
   }
 
   Future<void> signOut() async {
-    await _authService.signOut();
+    await _repository.signOut();
   }
 
   Future<bool> sendPasswordReset(String email) async {
     try {
-      await _authService.sendPasswordReset(email);
+      await _repository.sendPasswordReset(email);
       return true;
     } catch (_) {
       return false;
@@ -107,22 +128,10 @@ class AuthProvider extends ChangeNotifier {
     final data = <String, dynamic>{};
     if (name != null) data['name'] = name;
     if (photoUrl != null) data['photoUrl'] = photoUrl;
-    await _firestoreService.updateUser(_firebaseUser!.uid, data);
+    await _repository.updateProfile(_firebaseUser!.uid, data);
   }
 
-  void _setLoading(bool val) {
-    _isLoading = val;
-    notifyListeners();
-  }
-
-  void _setError(String msg) {
-    _error = msg;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _error = null;
-  }
+  // ── Error mapping ─────────────────────────────────────────────────────────
 
   String _friendlyError(String code) {
     switch (code) {
@@ -151,7 +160,8 @@ class AuthProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _userSubscription?.cancel();
+    _authSub?.cancel();
+    _userSub?.cancel();
     super.dispose();
   }
 }

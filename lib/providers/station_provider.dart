@@ -1,122 +1,190 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../data/repositories/rental_repository.dart';
+import '../data/repositories/station_repository.dart';
 import '../models/bike_model.dart';
 import '../models/rental_model.dart';
 import '../models/station_model.dart';
-import '../services/firestore_service.dart';
+import '../states/station_state.dart';
 
 class StationProvider extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  final StationRepository _stationRepo;
+  final RentalRepository _rentalRepo;
 
-  List<StationModel> _stations = [];
-  StationModel? _selectedStation;
-  List<BikeModel> _selectedStationBikes = [];
-  RentalModel? _activeRental;
-  bool _isLoading = false;
-  String? _error;
+  StationState _state = const StationInitial();
 
-  StreamSubscription<List<StationModel>>? _stationsSubscription;
-  StreamSubscription<List<BikeModel>>? _bikesSubscription;
-  StreamSubscription<RentalModel?>? _rentalSubscription;
+  StreamSubscription<List<StationModel>>? _stationsSub;
+  StreamSubscription<List<BikeModel>>? _bikesSub;
+  StreamSubscription<RentalModel?>? _rentalSub;
 
-  List<StationModel> get stations => _stations;
-  StationModel? get selectedStation => _selectedStation;
-  List<BikeModel> get selectedStationBikes => _selectedStationBikes;
-  RentalModel? get activeRental => _activeRental;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
-  bool get hasActiveRental => _activeRental != null;
+  StationProvider({
+    StationRepository? stationRepository,
+    RentalRepository? rentalRepository,
+  })  : _stationRepo = stationRepository ?? StationRepository(),
+        _rentalRepo = rentalRepository ?? RentalRepository();
+
+  // ── State ─────────────────────────────────────────────────────────────────
+
+  StationState get state => _state;
+
+  // ── Convenience getters (screens use these) ───────────────────────────────
+
+  List<StationModel> get stations =>
+      _state is StationLoaded ? (_state as StationLoaded).stations : const [];
+
+  StationModel? get selectedStation =>
+      _state is StationLoaded ? (_state as StationLoaded).selectedStation : null;
+
+  List<BikeModel> get selectedStationBikes => _state is StationLoaded
+      ? (_state as StationLoaded).selectedStationBikes
+      : const [];
+
+  RentalModel? get activeRental =>
+      _state is StationLoaded ? (_state as StationLoaded).activeRental : null;
+
+  bool get hasActiveRental =>
+      _state is StationLoaded && (_state as StationLoaded).hasActiveRental;
+
+  /// True during initial load OR while a start/end-rental call is in flight.
+  bool get isLoading =>
+      _state is StationLoading ||
+      (_state is StationLoaded && (_state as StationLoaded).isActionLoading);
+
+  String? get error => _state is StationLoaded
+      ? (_state as StationLoaded).actionError
+      : null;
+
+  // ── Init ──────────────────────────────────────────────────────────────────
 
   void init(String userId) {
-    _stationsSubscription?.cancel();
-    _stationsSubscription =
-        _firestoreService.getStations().listen((list) {
-      _stations = list;
+    _state = const StationLoading();
+    notifyListeners();
+
+    _stationsSub?.cancel();
+    _stationsSub = _stationRepo.watchStations().listen((list) {
+      final current =
+          _state is StationLoaded ? _state as StationLoaded : null;
+      _state = (current ?? const StationLoaded(stations: [])).copyWith(
+        stations: list,
+      );
+      notifyListeners();
+    }, onError: (_) {
+      _state = const StationError('Failed to load stations.');
       notifyListeners();
     });
 
-    _rentalSubscription?.cancel();
-    _rentalSubscription =
-        _firestoreService.getActiveRental(userId).listen((rental) {
-      _activeRental = rental;
-      notifyListeners();
+    _rentalSub?.cancel();
+    _rentalSub = _rentalRepo.watchActiveRental(userId).listen((rental) {
+      if (_state is StationLoaded) {
+        _state = (_state as StationLoaded).copyWith(activeRental: rental);
+        notifyListeners();
+      }
     });
   }
 
+  // ── Station selection ─────────────────────────────────────────────────────
+
   void selectStation(StationModel station) {
-    _selectedStation = station;
-    _bikesSubscription?.cancel();
-    _bikesSubscription =
-        _firestoreService.getBikesForStation(station.id).listen((bikes) {
-      _selectedStationBikes = bikes;
-      notifyListeners();
-    });
+    if (_state is! StationLoaded) return;
+    _state = (_state as StationLoaded).copyWith(
+      selectedStation: station,
+      selectedStationBikes: [],
+    );
     notifyListeners();
+
+    _bikesSub?.cancel();
+    _bikesSub =
+        _stationRepo.watchBikesForStation(station.id).listen((bikes) {
+      if (_state is StationLoaded) {
+        _state =
+            (_state as StationLoaded).copyWith(selectedStationBikes: bikes);
+        notifyListeners();
+      }
+    });
   }
 
   void clearSelectedStation() {
-    _selectedStation = null;
-    _selectedStationBikes = [];
-    _bikesSubscription?.cancel();
+    if (_state is! StationLoaded) return;
+    _bikesSub?.cancel();
+    _state = (_state as StationLoaded).copyWith(
+      selectedStation: null,
+      selectedStationBikes: [],
+    );
     notifyListeners();
   }
+
+  // ── Rental actions ────────────────────────────────────────────────────────
 
   Future<RentalModel?> startRental({
     required String userId,
     required BikeModel bike,
     required StationModel station,
   }) async {
-    _isLoading = true;
-    _error = null;
+    if (_state is! StationLoaded) return null;
+    _state = (_state as StationLoaded).copyWith(
+      isActionLoading: true,
+      actionError: null,
+    );
     notifyListeners();
+
     try {
-      final rental = await _firestoreService.startRental(
+      final rental = await _rentalRepo.startRental(
         userId: userId,
         bike: bike,
         station: station,
       );
-      _activeRental = rental;
+      _state = (_state as StationLoaded).copyWith(
+        isActionLoading: false,
+        activeRental: rental,
+      );
       notifyListeners();
       return rental;
-    } catch (e) {
-      _error = 'Failed to start rental. Please try again.';
+    } catch (_) {
+      _state = (_state as StationLoaded).copyWith(
+        isActionLoading: false,
+        actionError: 'Failed to start rental. Please try again.',
+      );
       notifyListeners();
       return null;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
   }
 
   Future<bool> endRental() async {
-    if (_activeRental == null) return false;
-    _isLoading = true;
+    if (_state is! StationLoaded) return false;
+    final loaded = _state as StationLoaded;
+    if (loaded.activeRental == null) return false;
+
+    _state = loaded.copyWith(isActionLoading: true, actionError: null);
     notifyListeners();
+
     try {
-      await _firestoreService.endRental(
-        rentalId: _activeRental!.id,
-        bikeId: _activeRental!.bikeId,
-        stationId: _activeRental!.stationId,
-        startTime: _activeRental!.startTime,
+      await _rentalRepo.endRental(
+        rentalId: loaded.activeRental!.id,
+        bikeId: loaded.activeRental!.bikeId,
+        stationId: loaded.activeRental!.stationId,
+        startTime: loaded.activeRental!.startTime,
       );
-      _activeRental = null;
+      _state = (_state as StationLoaded).copyWith(
+        isActionLoading: false,
+        activeRental: null,
+      );
       notifyListeners();
       return true;
-    } catch (e) {
-      _error = 'Failed to end rental. Please try again.';
+    } catch (_) {
+      _state = (_state as StationLoaded).copyWith(
+        isActionLoading: false,
+        actionError: 'Failed to end rental. Please try again.',
+      );
       notifyListeners();
       return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
   }
 
   @override
   void dispose() {
-    _stationsSubscription?.cancel();
-    _bikesSubscription?.cancel();
-    _rentalSubscription?.cancel();
+    _stationsSub?.cancel();
+    _bikesSub?.cancel();
+    _rentalSub?.cancel();
     super.dispose();
   }
 }
