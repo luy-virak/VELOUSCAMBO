@@ -1,6 +1,6 @@
 import '../models/user_model.dart';
 
-sealed class AuthState {
+abstract class AuthState {
   const AuthState();
 }
 

@@ -2,7 +2,7 @@ import '../models/bike_model.dart';
 import '../models/rental_model.dart';
 import '../models/station_model.dart';
 
-sealed class StationState {
+abstract class StationState {
   const StationState();
 }
 
