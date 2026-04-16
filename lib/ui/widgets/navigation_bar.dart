@@ -15,6 +15,7 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
 
   final List<Widget> _screens = const [
     MapScreen(),
+    SearchScreen(),
     HistoryScreen(),
     ProfileScreen(),
   ];
@@ -51,22 +52,32 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 NavItem(
-                  icon: selectedIndex == 0 ? Icons.map_rounded : Icons.map_outlined,
+                  icon: selectedIndex == 0
+                      ? Icons.map_rounded
+                      : Icons.map_outlined,
                   label: "Map",
                   isSelected: selectedIndex == 0,
                   onTap: () => onTap(0),
                 ),
                 NavItem(
-                  icon: Icons.history_rounded,
-                  label: "History",
+                  icon: Icons.search_rounded,
+                  label: "Search",
                   isSelected: selectedIndex == 1,
                   onTap: () => onTap(1),
                 ),
                 NavItem(
-                  icon: selectedIndex == 2 ? Icons.person_rounded : Icons.person_outline_rounded,
-                  label: "Profile",
+                  icon: Icons.history_rounded,
+                  label: "History",
                   isSelected: selectedIndex == 2,
                   onTap: () => onTap(2),
+                ),
+                NavItem(
+                  icon: selectedIndex == 3
+                      ? Icons.person_rounded
+                      : Icons.person_outline_rounded,
+                  label: "Profile",
+                  isSelected: selectedIndex == 3,
+                  onTap: () => onTap(3),
                 ),
               ],
             ),
