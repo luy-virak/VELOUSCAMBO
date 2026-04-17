@@ -1,6 +1,6 @@
-import '../../models/bike_model.dart';
-import '../../models/station_model.dart';
-import '../../services/firestore_service.dart';
+import 'package:velouscambo/data/models/bike_model.dart';
+import 'package:velouscambo/data/models/station_model.dart';
+import 'package:velouscambo/data/services/firestore_service.dart';
 
 class StationRepository {
   final FirestoreService _firestore;

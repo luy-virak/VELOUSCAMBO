@@ -1,6 +1,7 @@
 # Miscellaneous
 .vscode
 .claude
+.codex
 *.class
 *.log
 *.pyc

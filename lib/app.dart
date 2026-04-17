@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'core/theme/app_theme.dart';
-import 'screens/splash/splash_screen.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/register_screen.dart';
-import 'screens/main/main_screen.dart';
-import 'screens/booking/booking_screen.dart';
-import 'screens/booking/active_rental_screen.dart';
-import 'screens/profile/edit_profile_screen.dart';
-import 'screens/search/search_screen.dart';
+import 'package:velouscambo/core/theme/app_theme.dart';
+import 'package:velouscambo/features/splash/view/splash_screen.dart';
+import 'package:velouscambo/features/auth/view/login_screen.dart';
+import 'package:velouscambo/features/auth/view/register_screen.dart';
+import 'package:velouscambo/features/main/view/main_screen.dart';
+import 'package:velouscambo/features/ride/view/booking_screen.dart';
+import 'package:velouscambo/features/ride/view/active_rental_screen.dart';
+import 'package:velouscambo/features/profile/view/edit_profile_screen.dart';
+import 'package:velouscambo/features/search/view/search_screen.dart';
 
 class VelousCamboApp extends StatelessWidget {
   const VelousCamboApp({super.key});

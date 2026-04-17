@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../models/user_model.dart';
-import '../../services/auth_service.dart';
-import '../../services/firestore_service.dart';
+import 'package:velouscambo/data/models/user_model.dart';
+import 'package:velouscambo/data/services/auth_service.dart';
+import 'package:velouscambo/data/services/firestore_service.dart';
 
 class AuthRepository {
   final AuthService _auth;
