@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:velouscambo/data/models/user_model.dart';
+import 'package:velouscambo/models/user_model.dart';
 import 'package:velouscambo/data/services/auth_service.dart';
 import 'package:velouscambo/data/services/firestore_service.dart';
 

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:velouscambo/data/models/user_model.dart';
+import 'package:velouscambo/models/user_model.dart';
 
 class UserDto {
   static UserModel fromFirestore(DocumentSnapshot doc) {

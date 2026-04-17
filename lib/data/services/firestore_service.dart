@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:velouscambo/data/models/station_model.dart';
-import 'package:velouscambo/data/models/bike_model.dart';
-import 'package:velouscambo/data/models/user_model.dart';
-import 'package:velouscambo/data/models/rental_model.dart';
+import 'package:velouscambo/models/station_model.dart';
+import 'package:velouscambo/models/bike_model.dart';
+import 'package:velouscambo/models/user_model.dart';
+import 'package:velouscambo/models/rental_model.dart';
 import 'package:velouscambo/data/dto/station_dto.dart';
 import 'package:velouscambo/data/dto/bike_dto.dart';
 import 'package:velouscambo/data/dto/user_dto.dart';

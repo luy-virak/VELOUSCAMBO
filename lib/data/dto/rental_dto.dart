@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:velouscambo/data/models/rental_model.dart';
+import 'package:velouscambo/models/rental_model.dart';
 
 class RentalDto {
   static RentalModel fromFirestore(DocumentSnapshot doc) {

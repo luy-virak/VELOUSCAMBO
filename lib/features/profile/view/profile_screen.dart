@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:velouscambo/core/constants/app_colors.dart';
-import 'package:velouscambo/data/models/user_model.dart';
+import 'package:velouscambo/models/user_model.dart';
 import 'package:velouscambo/features/auth/viewmodel/auth_viewmodel.dart';
 
 class ProfileScreen extends StatelessWidget {

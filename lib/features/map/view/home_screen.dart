@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:velouscambo/core/constants/app_colors.dart';
-import 'package:velouscambo/data/models/station_model.dart';
+import 'package:velouscambo/models/station_model.dart';
 import 'package:velouscambo/features/map/viewmodel/station_viewmodel.dart';
 import 'package:velouscambo/features/map/widgets/station_detail_sheet.dart';
 

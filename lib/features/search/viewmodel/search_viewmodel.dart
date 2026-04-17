@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:velouscambo/data/models/station_model.dart';
+import 'package:velouscambo/models/station_model.dart';
 
 /// Manages the search query for the station search screen.
 /// Station data comes from [StationViewModel]; this ViewModel only

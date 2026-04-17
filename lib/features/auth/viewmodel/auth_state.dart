@@ -1,4 +1,4 @@
-import 'package:velouscambo/data/models/user_model.dart';
+import 'package:velouscambo/models/user_model.dart';
 
 abstract class AuthState {
   const AuthState();

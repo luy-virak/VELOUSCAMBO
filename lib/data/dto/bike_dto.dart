@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:velouscambo/data/models/bike_model.dart';
+import 'package:velouscambo/models/bike_model.dart';
 
 class BikeDto {
   static BikeModel fromFirestore(DocumentSnapshot doc) {

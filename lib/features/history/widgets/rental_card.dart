@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:velouscambo/core/constants/app_colors.dart';
-import 'package:velouscambo/data/models/rental_model.dart';
+import 'package:velouscambo/models/rental_model.dart';
 import 'package:velouscambo/shared/widgets/icon_box.dart';
 import 'package:velouscambo/shared/widgets/surface_card.dart';
 

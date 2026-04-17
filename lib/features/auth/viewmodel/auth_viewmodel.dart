@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:velouscambo/data/repositories/auth_repository.dart';
-import 'package:velouscambo/data/models/user_model.dart';
+import 'package:velouscambo/models/user_model.dart';
 import 'package:velouscambo/features/auth/viewmodel/auth_state.dart';
 
 class AuthViewModel extends ChangeNotifier {

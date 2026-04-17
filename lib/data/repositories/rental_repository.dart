@@ -1,6 +1,6 @@
-import 'package:velouscambo/data/models/bike_model.dart';
-import 'package:velouscambo/data/models/rental_model.dart';
-import 'package:velouscambo/data/models/station_model.dart';
+import 'package:velouscambo/models/bike_model.dart';
+import 'package:velouscambo/models/rental_model.dart';
+import 'package:velouscambo/models/station_model.dart';
 import 'package:velouscambo/data/services/firestore_service.dart';
 
 class RentalRepository {

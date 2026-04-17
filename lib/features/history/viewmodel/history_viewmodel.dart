@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:velouscambo/data/models/rental_model.dart';
+import 'package:velouscambo/models/rental_model.dart';
 import 'package:velouscambo/data/repositories/rental_repository.dart';
 import 'package:velouscambo/features/history/viewmodel/history_state.dart';
 

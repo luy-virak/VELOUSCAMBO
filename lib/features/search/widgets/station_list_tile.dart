@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:velouscambo/core/constants/app_colors.dart';
-import 'package:velouscambo/data/models/station_model.dart';
+import 'package:velouscambo/models/station_model.dart';
 import 'package:velouscambo/features/map/viewmodel/station_viewmodel.dart';
 import 'package:velouscambo/features/map/widgets/station_detail_sheet.dart';
 import 'package:velouscambo/shared/widgets/icon_box.dart';

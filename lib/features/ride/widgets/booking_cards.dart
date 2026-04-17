@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:velouscambo/core/constants/app_colors.dart';
-import 'package:velouscambo/data/models/bike_model.dart';
-import 'package:velouscambo/data/models/station_model.dart';
+import 'package:velouscambo/models/bike_model.dart';
+import 'package:velouscambo/models/station_model.dart';
 import 'package:velouscambo/shared/widgets/icon_box.dart';
 import 'package:velouscambo/shared/widgets/surface_card.dart';
 
