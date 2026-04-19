@@ -17,46 +17,40 @@ class AppNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(40),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 15,
-              spreadRadius: 2,
-              offset: const Offset(0, 5),
+          border: Border(
+            top: BorderSide(
+              color: AppColors.border.withOpacity(0.3),
             ),
-          ],
-          border: Border.all(color: AppColors.border.withOpacity(0.5)),
+          ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               NavItem(
-                icon: selectedIndex == 0
-                    ? Icons.map_rounded
-                    : Icons.map_outlined,
-                label: "Map",
+                selectedIcon: Icons.map_rounded,
+                unselectedIcon: Icons.map_outlined,
+                label: 'Map',
                 isSelected: selectedIndex == 0,
                 onTap: () => onTap(0),
               ),
               NavItem(
-                icon: Icons.history_rounded,
-                label: "History",
+                selectedIcon: Icons.history_rounded,
+                unselectedIcon: Icons.history_outlined,
+                label: 'History',
                 isSelected: selectedIndex == 1,
                 badge: hasActiveRental,
                 onTap: () => onTap(1),
               ),
               NavItem(
-                icon: selectedIndex == 2
-                    ? Icons.person_rounded
-                    : Icons.person_outline_rounded,
-                label: "Profile",
+                selectedIcon: Icons.person_rounded,
+                unselectedIcon: Icons.person_outline_rounded,
+                label: 'Profile',
                 isSelected: selectedIndex == 2,
                 onTap: () => onTap(2),
               ),
