@@ -92,15 +92,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    tp.paint(canvas,
-        Offset((size - tp.width) / 2, (size - tp.height) / 2));
+    tp.paint(canvas, Offset((size - tp.width) / 2, (size - tp.height) / 2));
 
     final picture = recorder.endRecording();
-    final image =
-        await picture.toImage(size.toInt(), size.toInt());
+    final image = await picture.toImage(size.toInt(), size.toInt());
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    final descriptor =
-        BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
+    final descriptor = BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
     _markerCache[key] = descriptor;
     return descriptor;
   }
@@ -179,7 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
             top: MediaQuery.of(context).padding.top + 12,
             left: 16,
             right: 16,
-            child: _SearchBar(onTap: () => Navigator.pushNamed(context, '/search')),
+            child: _SearchBar(
+                onTap: () => Navigator.pushNamed(context, '/search')),
           ),
 
           // Active rental banner
@@ -208,7 +206,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 }
 
 // ─── Search Bar ───────────────────────────────────────────────────────────────
@@ -258,8 +255,8 @@ class _SearchBar extends StatelessWidget {
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.tune_rounded,
-                  color: Colors.white, size: 18),
+              child:
+                  const Icon(Icons.tune_rounded, color: Colors.white, size: 18),
             ),
           ],
         ),
@@ -296,7 +293,9 @@ class _ActiveRentalBannerState extends State<_ActiveRentalBanner> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) {
         setState(() {
-          _elapsed = context.read<StationViewModel>().activeRental?.elapsedFormatted ?? _elapsed;
+          _elapsed =
+              context.read<StationViewModel>().activeRental?.elapsedFormatted ??
+                  _elapsed;
         });
       }
     });
@@ -361,8 +360,7 @@ class _ActiveRentalBannerState extends State<_ActiveRentalBanner> {
               ),
             ),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),

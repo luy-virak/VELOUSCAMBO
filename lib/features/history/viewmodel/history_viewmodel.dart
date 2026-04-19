@@ -41,8 +41,8 @@ class HistoryViewModel extends ChangeNotifier {
         _state = HistoryLoaded(list);
         notifyListeners();
       },
-      onError: (_) {
-        _state = const HistoryError('Failed to load ride history.');
+      onError: (e) {
+        _state = HistoryError('Failed to load ride history: $e');
         notifyListeners();
       },
     );

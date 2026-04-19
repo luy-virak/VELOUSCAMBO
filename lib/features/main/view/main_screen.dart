@@ -5,7 +5,6 @@ import 'package:velouscambo/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:velouscambo/features/history/viewmodel/history_viewmodel.dart';
 import 'package:velouscambo/features/map/viewmodel/station_viewmodel.dart';
 import 'package:velouscambo/features/map/view/home_screen.dart';
-import 'package:velouscambo/features/search/view/search_screen.dart';
 import 'package:velouscambo/features/history/view/history_screen.dart';
 import 'package:velouscambo/features/profile/view/profile_screen.dart';
 
@@ -21,7 +20,6 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = const [
     HomeScreen(),
-    SearchScreen(),
     HistoryScreen(),
     ProfileScreen(),
   ];
@@ -86,26 +84,19 @@ class _BottomNav extends StatelessWidget {
                 onTap: () => onTap(0),
               ),
               _NavItem(
-                icon: Icons.search_rounded,
-                activeIcon: Icons.search_rounded,
-                label: 'Search',
-                isActive: currentIndex == 1,
-                onTap: () => onTap(1),
-              ),
-              _NavItem(
                 icon: Icons.history_rounded,
                 activeIcon: Icons.history_rounded,
                 label: 'History',
-                isActive: currentIndex == 2,
+                isActive: currentIndex == 1,
                 badge: hasActiveRental,
-                onTap: () => onTap(2),
+                onTap: () => onTap(1),
               ),
               _NavItem(
                 icon: Icons.person_outline_rounded,
                 activeIcon: Icons.person_rounded,
                 label: 'Profile',
-                isActive: currentIndex == 3,
-                onTap: () => onTap(3),
+                isActive: currentIndex == 2,
+                onTap: () => onTap(2),
               ),
             ],
           ),
